@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light" data-density="comfortable">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Service Desk Toolkit: an offline ticket generator, knowledge base and library. Everything stays on this computer.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#0f1b2d">
+<!-- This app never talks to the internet. The policy below makes the browser refuse any network request, form post, frame or plug-in. -->
+<meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; worker-src 'none'">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230a766f'/%3E%3Cpath d='M9 11h14v3a2 2 0 0 0 0 4v3H9v-3a2 2 0 0 0 0-4z' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<title>Service Desk Toolkit</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/dashboard.css">
+<link rel="stylesheet" href="assets/css/forms.css">
+<link rel="stylesheet" href="assets/css/responsive.css">
+<link rel="stylesheet" href="assets/css/modern.css">
+</head>
+<body>
+<noscript><p style="margin:0;padding:16px;background:#fff3d6;color:#5a3a00;font:16px sans-serif">Service Desk Toolkit needs JavaScript. Turn it on in your browser settings and reload this page. Nothing is sent to the internet.</p></noscript>
+
+<!-- Local SVG icon sprite (no external files, works on file://) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-dashboard" viewBox="0 0 24 24"><path d="M3 3h8v10H3zM13 3h8v6h-8zM13 11h8v10h-8zM3 15h8v6H3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-ticket" viewBox="0 0 24 24"><path d="M4 6h16v4a2 2 0 0 0 0 4v4H4v-4a2 2 0 0 0 0-4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-history" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 3-6.2M4 4v4h4M12 8v5l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H10l-4 4v-4H4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24"><path d="M8 8l-5 4 5 4M16 8l5 4-5 4M14 5l-4 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-flow" viewBox="0 0 24 24"><path d="M4 4h6v5H4zM14 15h6v5h-6zM7 9v5a2 2 0 002 2h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 4h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1zM8 12l3 3 5-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-tools" viewBox="0 0 24 24"><path d="M6 3h12a1 1 0 011 1v16a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1zM8 7h8M8 12h2M12 12h2M8 16h2M12 16h2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 01-1 1h-4v-6H9v6H5a1 1 0 01-1-1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-focus" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
+  <symbol id="i-save" viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5zM8 4v5h7V4M8 20v-6h8v6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><path d="M9 9h11v11H9zM5 15V4h11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-compact" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><path d="M3 6h18v12H3zM3 7l9 7 9-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 16l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+</svg>
+
+<a href="#" id="skip-link" class="skip-link">Skip to main content</a>
+<button id="focus-exit" type="button" class="btn btn-sm focus-exit" hidden>Exit focus mode</button>
+<div class="app">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar" aria-label="Main navigation">
+    <div class="brand"><span class="brand-name">Service Desk Toolkit</span><button id="nav-slim-toggle" type="button" class="nav-slim-btn" aria-pressed="false" aria-label="Collapse the menu to icons" title="Collapse the menu to icons">&laquo;</button></div>
+    <nav id="nav" aria-label="Pages">
+      <p class="nav-group">Work</p>
+      <a href="#ticket" data-view="ticket"><svg class="ico" aria-hidden="true"><use href="#i-ticket"/></svg>Ticket Generator</a>
+      <a href="#history" data-view="history"><svg class="ico" aria-hidden="true"><use href="#i-history"/></svg>Ticket History</a>
+      <a href="#favorites" data-view="favorites"><svg class="ico" aria-hidden="true"><use href="#i-star"/></svg>Favorites</a>
+      <p class="nav-group">Library</p>
+      <a href="#library" data-view="library"><svg class="ico" aria-hidden="true"><use href="#i-home"/></svg>Library home</a>
+      <a href="#kb" data-view="kb"><svg class="ico" aria-hidden="true"><use href="#i-book"/></svg>Knowledge Base</a>
+      <a href="#flows" data-view="flows"><svg class="ico" aria-hidden="true"><use href="#i-flow"/></svg>Question Flows</a>
+      <a href="#checklists" data-view="checklists"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Checklists</a>
+      <a href="#snippets" data-view="snippets"><svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg>Canned Responses</a>
+      <a href="#email" data-view="email"><svg class="ico" aria-hidden="true"><use href="#i-mail"/></svg>Email Templates</a>
+      <a href="#scripts" data-view="scripts"><svg class="ico" aria-hidden="true"><use href="#i-code"/></svg>Script Library</a>
+      <a href="#reference" data-view="reference"><svg class="ico" aria-hidden="true"><use href="#i-list"/></svg>Quick Reference</a>
+      <a href="#tools" data-view="tools"><svg class="ico" aria-hidden="true"><use href="#i-tools"/></svg>Tools</a>
+      <p class="nav-group">Insights</p>
+      <a href="#dashboard" data-view="dashboard"><svg class="ico" aria-hidden="true"><use href="#i-dashboard"/></svg>Dashboard</a>
+      <a href="#reports" data-view="reports"><svg class="ico" aria-hidden="true"><use href="#i-chart"/></svg>Reports</a>
+      <p class="nav-group">App</p>
+      <a href="#settings" data-view="settings"><svg class="ico" aria-hidden="true"><use href="#i-gear"/></svg>Settings</a>
+    </nav>
+    <p id="app-version" class="app-version"></p>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-wrap">
+    <div id="tab-banner" class="tab-banner" role="alert" hidden>
+      <span id="tab-banner-text"></span>
+      <button id="tab-banner-reload" type="button" class="btn btn-sm">Reload this tab</button>
+      <button id="tab-banner-close" type="button" class="btn btn-ghost btn-sm">Dismiss</button>
+    </div>
+    <header class="topbar">
+      <div class="search-box">
+        <svg class="ico" aria-hidden="true"><use href="#i-search"/></svg>
+        <input id="global-search" aria-label="Search the Knowledge Base" type="search" placeholder="Search KB by title, keyword, category, or KB ID  ( / )   |   Commands: Ctrl+K" autocomplete="off">
+      </div>
+      <button id="storage-pill" type="button" class="pill-warn" hidden></button>
+      <span id="net-pill" class="net-pill" role="status" aria-live="polite"></span>
+      <button id="palette-btn" type="button" class="btn btn-ghost btn-sm" title="Open the command palette (Ctrl+K)">Commands <kbd>Ctrl K</kbd></button>
+      <button id="bk-reconnect-top" type="button" class="btn btn-sm" hidden>Reconnect backup folder</button>
+      <button id="theme-toggle" class="btn btn-ghost" title="Toggle light/dark mode" aria-label="Toggle light/dark mode">
+        <svg class="ico" aria-hidden="true"><use href="#i-moon"/></svg>
+      </button>
+    </header>
+
+    <div class="content">
+      <main id="main">
+
+        <!-- TICKET GENERATOR -->
+        <section class="view" id="view-ticket">
+          <div class="view-head">
+            <h1>Ticket Generator</h1>
+            <div class="head-actions">
+              <div class="tool-group" role="group" aria-label="Write an email or copy a response">
+                <select id="tk-email" class="head-select" aria-label="Write an email from a template"></select>
+                <select id="tk-snippet" class="head-select" aria-label="Copy a canned response"></select>
+              </div>
+              <div class="tool-group" role="group" aria-label="Ticket tools">
+                <button id="tk-focus" type="button" class="btn btn-ghost" aria-pressed="false" title="Hide the menu and side panels during a call (Alt+F)"><svg class="btn-ico" aria-hidden="true"><use href="#i-focus"/></svg><span class="btn-label">Focus</span></button>
+                <button id="tk-compact" type="button" class="btn btn-ghost" aria-pressed="false" title="Tighter spacing on the ticket page (Alt+D)"><svg class="btn-ico" aria-hidden="true"><use href="#i-compact"/></svg><span class="btn-label">Compact</span></button>
+                <button id="tk-new" type="button" class="btn btn-ghost"><svg class="btn-ico" aria-hidden="true"><use href="#i-plus"/></svg><span class="btn-label">New ticket</span></button>
+              </div>
+              <button id="tk-save" type="button" class="btn btn-outline"><svg class="btn-ico" aria-hidden="true"><use href="#i-save"/></svg><span class="btn-label">Save ticket</span></button>
+              <button id="tk-save-next" type="button" class="btn" title="Save, then start the next ticket (Alt+S)"><span class="btn-label">Save &amp; next</span></button>
+            </div>
+          </div>
+
+          <div class="tabs-row">
+            <div id="tk-tabs" class="tabs" role="tablist" aria-label="Open tickets"></div>
+            <span id="tk-saved" class="saved-chip" aria-hidden="true"></span>
+            <div class="timer" role="group" aria-label="Call timer">
+              <span id="tk-timer-display" class="timer-display" aria-live="off">00:00</span>
+              <button id="tk-timer-toggle" type="button" class="btn btn-ghost btn-sm">Start</button>
+              <button id="tk-timer-reset" type="button" class="btn btn-ghost btn-sm">Reset</button>
+              <label class="check"><input type="checkbox" id="tk-timer-include"> Add to work notes</label>
+            </div>
+          </div>
+
+          <div class="tk-layout">
+            <div class="tk-main">
+
+              <div class="panel tk-block tk-said" id="tk-said-panel">
+                <div class="panel-head"><h2>What the user said <span class="label-hint">in their own words. Kept only in this draft, never saved to history.</span></h2></div>
+                <label class="sr-only" for="tk-said">What the user said</label>
+                <textarea id="tk-said" class="tk-said-box" rows="2" placeholder="Type or paste what the user told you. Flows and KIs are suggested as you type. Ctrl+Enter starts the best flow."></textarea>
+                <p id="tk-said-warn" class="warn" hidden>This looks like a password or secret. Remove it - never keep credentials in notes.</p>
+                <div id="tk-said-hints" class="said-hints" aria-live="polite" hidden></div>
+              </div>
+
+              <div class="panel tk-block">
+                <h2><span class="step-no">1</span>User details</h2>
+                <div class="form-grid cols4">
+                  <div><label for="tk-userid">User ID</label><input id="tk-userid" type="text" autocomplete="off"><p id="tk-hint-userid" class="field-hint" hidden></p></div>
+                  <div><label for="tk-username">User Name</label><input id="tk-username" type="text" autocomplete="off"></div>
+                  <div><label for="tk-host">Machine Hostname</label><input id="tk-host" type="text" autocomplete="off"><p id="tk-hint-host" class="field-hint" hidden></p></div>
+                  <div><label for="tk-tz">Time Zone</label><input id="tk-tz" type="text" list="tk-tz-list" autocomplete="off">
+                    <datalist id="tk-tz-list"><option value="PST"><option value="MST"><option value="CST"><option value="EST"><option value="AKST"><option value="HST"></datalist><p id="tk-localtime" class="field-hint" aria-live="off"></p></div>
+                  <div class="full"><label for="tk-issue">Issue reported <span class="label-hint">(Enter opens the KI picker)</span></label>
+                    <input id="tk-issue" type="text" autocomplete="off" placeholder="e.g. forgot password, VPN not connecting">
+                    <div id="tk-suggest" class="suggest" hidden></div></div>
+                </div>
+                <div id="tk-caller" class="suggest" aria-live="polite" hidden></div>
+                <div id="tk-repeat" class="repeat-note" aria-live="polite" hidden></div>
+              </div>
+
+              <div class="panel tk-block" id="tk-flow-panel">
+                <div class="panel-head"><h2><span class="step-no">2</span>Probing questions <span class="label-hint">optional</span></h2><button id="tk-flow-toggle" type="button" class="btn btn-ghost btn-sm" aria-expanded="true" aria-controls="tk-flow">Hide</button></div>
+                <div id="tk-flow" class="fl-run"></div>
+              </div>
+
+              <div class="panel tk-block">
+                <h2><span class="step-no">3</span>KIs</h2>
+                <div class="ki-bar">
+                  <div id="tk-ki-used" class="ki-chips"></div>
+                  <button id="tk-find" type="button" class="btn btn-sm">Find KIs...</button>
+                </div>
+                <div class="tpl-row"><span class="tpl-label">Templates:</span><div id="tk-templates" class="tpl-list"></div>
+                  <button id="tk-tpl-save" type="button" class="btn btn-ghost btn-sm">Save current as template</button></div>
+              </div>
+
+              <div class="tk-row">
+                <div class="panel col">
+                  <h2><span class="step-no">4</span>Ticket fields</h2>
+                  <div class="stack">
+                    <div><label for="tk-short">Issue (Short Description)</label><input id="tk-short" type="text" autocomplete="off"></div>
+                    <div class="grow"><label for="tk-desc">Description</label><textarea id="tk-desc"></textarea></div>
+                    <div class="outcome-row">
+                      <div><label for="tk-outcome">Outcome</label>
+                        <select id="tk-outcome">
+                          <option value="">Not set</option>
+                          <option>Resolved</option>
+                          <option>Escalated</option>
+                          <option>Pending user response</option>
+                          <option>Follow-up required</option>
+                          <option>Unable to resolve</option>
+                        </select></div>
+                      <div><label for="tk-outcome-note">Outcome details (optional)</label><input id="tk-outcome-note" type="text" autocomplete="off" placeholder="e.g. user confirmed login works"></div>
+                    </div>
+                    <div class="outcome-row">
+                      <div><label for="tk-followup">Follow-up reminder (optional)</label><input id="tk-followup" type="datetime-local"></div>
+                      <p class="empty small followup-hint">Shows on the Dashboard once the ticket is saved, and warns you when it is due.</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="panel col">
+                  <h2><span class="step-no">5</span>Troubleshooting steps</h2>
+                  <p class="empty small hint">Check each step once it is completed. Collapse a KI when you are done with it.</p>
+                  <label class="check"><input type="checkbox" id="tk-stamp"> Add the time to checked steps in the work notes</label>
+                  <div class="btn-row"><button id="tk-guided-toggle" type="button" class="btn btn-ghost btn-sm" aria-pressed="false">Guided mode</button>
+                  <button id="tk-add-checklist" type="button" class="btn btn-ghost btn-sm" title="Add the steps of a checklist to this ticket">Add checklist</button></div>
+                  <div id="tk-guided" class="guided" hidden></div>
+                  <div id="tk-steps" class="steps-wrap"></div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Side column: Temporary notes are always visible. On screens wider than 1400px the live preview sits under them. -->
+            <aside class="tk-live" data-tab="notes" aria-label="Notes, live preview and AI rewrite">
+              <div class="tk-tabs seg" role="tablist" aria-label="Side panel">
+                <button type="button" role="tab" id="tk-tab-notes" data-tab="notes" aria-selected="true" aria-controls="tk-tp-notes">Notes</button>
+                <button type="button" role="tab" id="tk-tab-preview" class="live-only" data-tab="preview" aria-selected="false" aria-controls="tk-tp-preview" tabindex="-1">Live preview</button>
+                <button type="button" role="tab" id="tk-tab-ai" data-tab="ai" aria-selected="false" aria-controls="tk-tp-ai" tabindex="-1">AI rewrite</button>
+              </div>
+              <div id="tk-tp-notes" role="tabpanel" aria-labelledby="tk-tab-notes" data-tabpanel="notes">
+                <div class="panel tk-notes-panel">
+                  <h2>Temporary notes</h2>
+                  <div id="tk-ask" class="ask-box" hidden>
+                  <div class="ask-head"><h3>Ask the user</h3><span id="tk-ask-count" class="result-meta"></span></div>
+                  <div id="tk-ask-list"></div>
+                </div>
+                  <textarea id="tk-notes" class="tk-notes" aria-label="Temporary notes" placeholder="Scratchpad while talking to the user."></textarea>
+                  <p id="tk-notes-warn" class="warn" hidden>This looks like a password or secret. Remove it - never keep credentials in notes.</p>
+                  <p class="empty small">Working draft only. Never enter passwords. Notes are not saved to ticket history or copied.</p>
+                </div>
+              </div>
+              <div id="tk-tp-preview" role="tabpanel" aria-labelledby="tk-tab-preview" data-tabpanel="preview">
+                <div class="panel live-only"><div class="panel-head"><h2>Ticket details</h2><button id="tk-live-copy-ticket" type="button" class="btn btn-sm">Copy ticket details</button></div><pre id="tk-live-ticket" class="output compact"></pre></div>
+                <div class="panel live-only"><div class="panel-head"><h2>Work notes</h2><button id="tk-live-copy-notes" type="button" class="btn btn-sm">Copy work notes</button></div><pre id="tk-live-notes" class="output compact"></pre></div>
+              </div>
+              <div id="tk-tp-ai" role="tabpanel" aria-labelledby="tk-tab-ai" data-tabpanel="ai">
+                <div class="panel tk-ai-panel">
+                  <div class="ai-box">
+                  <h2>Rewrite with AI</h2>
+                  <p class="empty small">1. Type the user's report above. 2. Copy the prompt and paste it into your approved AI tool. 3. Paste its reply here and apply it. Nothing is sent by this app.</p>
+                  <label for="tk-ai-preset" class="sr-only">Prompt to use</label>
+                  <select id="tk-ai-preset" class="head-select" aria-label="Prompt to use"></select>
+                  <div class="btn-row"><button id="tk-ai-copy" type="button" class="btn btn-sm">Copy prompt + notes</button></div>
+                  <label for="tk-ai-reply">AI reply</label>
+                  <textarea id="tk-ai-reply" aria-describedby="tk-ai-status" placeholder="Short Title: ...&#10;Incident Description: ..."></textarea>
+                  <p id="tk-ai-status" class="ai-status" aria-live="polite"></p>
+                  <div class="btn-row"><button id="tk-ai-apply" type="button" class="btn btn-sm" disabled>Apply to Short Description + Description</button></div>
+                </div>
+                </div>
+              </div>
+            </aside>
+          </div>
+
+          <!-- Sticky copy bar -->
+          <div class="copybar" role="region" aria-label="Copy">
+            <span id="tk-status" class="copybar-status" aria-live="polite"></span>
+            <div class="copybar-actions">
+              <button id="tk-escalate" type="button" class="btn btn-ghost">Escalation note...</button>
+              <button id="tk-review" type="button" class="btn btn-ghost">Review...</button>
+              <button id="tk-copy-notes" type="button" class="btn"><svg class="btn-ico" aria-hidden="true"><use href="#i-copy"/></svg><span class="btn-label">Copy work notes</span></button>
+              <button id="tk-copy-ticket" type="button" class="btn"><svg class="btn-ico" aria-hidden="true"><use href="#i-copy"/></svg><span class="btn-label">Copy ticket details</span></button>
+            </div>
+          </div>
+        </section>
+
+        <!-- KNOWLEDGE BASE -->
+        <section class="view" id="view-kb">
+          <div class="view-head"><h1>Knowledge Base</h1>
+            <div class="head-actions">
+              <button id="kb-export" type="button" class="btn btn-ghost">Export KB</button>
+              <button id="kb-import" type="button" class="btn btn-ghost">Import KB</button>
+              <input id="kb-file" type="file" accept=".json,application/json" hidden aria-label="Choose a Knowledge Base file">
+              <button id="kb-new" type="button" class="btn">New KI</button>
+            </div></div>
+          <p id="kb-summary" class="empty small" aria-live="polite"></p>
+          <div class="kb-layout">
+            <ul id="kb-results" class="result-list"></ul>
+            <article id="kb-detail" class="panel"></article>
+          </div>
+        </section>
+
+        <!-- CANNED RESPONSES -->
+        <section class="view" id="view-snippets">
+          <div class="view-head"><h1>Canned Responses</h1>
+            <div class="head-actions">
+              <input id="sn-search" type="text" class="head-search" aria-label="Filter canned responses" placeholder="Filter responses" autocomplete="off">
+              <button id="sn-new" type="button" class="btn">New response</button>
+            </div></div>
+          <ul id="sn-list" class="snippet-list"></ul>
+        </section>
+
+        <!-- TICKET HISTORY -->
+        <section class="view" id="view-email">
+          <div class="view-head"><h1>Email Templates</h1>
+            <div class="head-actions">
+              <input id="em-search" type="text" class="head-search" aria-label="Filter email templates" placeholder="Filter templates" autocomplete="off">
+              <button id="em-new" type="button" class="btn">New template</button>
+            </div></div>
+          <p class="empty small em-intro">Choose Use, fill in the details, then copy the message or open it in your mail app. The app cannot send mail itself. Details from the open ticket are filled in for you.</p>
+          <ul id="em-list" class="snippet-list"></ul>
+          <div class="panel em-log">
+            <div class="em-log-head"><h2>Recent emails</h2><button id="em-log-clear" type="button" class="btn btn-ghost btn-sm">Clear list</button></div>
+            <ul id="em-log" class="list"></ul>
+          </div>
+        </section>
+
+        <section class="view" id="view-reports">
+          <div class="view-head"><h1>Reports</h1>
+            <div class="head-actions">
+              <label for="rp-period" class="sr-only">Period</label><select id="rp-period" class="head-select"></select>
+              <button id="rp-weekly" type="button" class="btn">Copy weekly summary</button>
+            </div></div>
+          <div id="rp-body"></div>
+        </section>
+
+        <section class="view" id="view-reference">
+          <div class="view-head"><h1>Quick Reference</h1>
+            <div class="head-actions">
+              <input id="ref-search" type="text" class="head-search" aria-label="Search the quick reference" placeholder="Search commands, ports, error codes" autocomplete="off">
+              <label for="ref-group" class="sr-only">Group</label><select id="ref-group" class="head-select"></select>
+              <button id="ref-new" type="button" class="btn">New entry</button>
+            </div></div>
+          <p id="ref-summary" class="empty small" aria-live="polite"></p>
+          <ul id="ref-list" class="ref-list"></ul>
+        </section>
+
+        <section class="view" id="view-library">
+          <div class="view-head"><h1>Library home</h1></div>
+          <div id="lib-body"></div>
+        </section>
+
+        <section class="view" id="view-checklists">
+          <div class="view-head"><h1>Checklists</h1>
+            <div class="head-actions">
+              <input id="cl-search" type="text" class="head-search" aria-label="Search checklists" placeholder="Search checklists" autocomplete="off">
+              <button id="cl-new" type="button" class="btn">New checklist</button>
+            </div></div>
+          <p class="empty small">Steps for jobs you repeat, like a new laptop or offboarding. In the Ticket Generator choose Add checklist, tick the items as you go, and they appear in the work notes.</p>
+          <p id="cl-summary" class="empty small" aria-live="polite"></p>
+          <div id="cl-list" class="sc-list"></div>
+        </section>
+
+        <section class="view" id="view-tools">
+          <div class="view-head"><h1>Tools</h1></div>
+          <p class="empty small">Small offline helpers. Nothing you type here is saved or sent anywhere. Press ? any time to see the keyboard shortcuts.</p>
+          <div id="tl-body" class="tl-grid"></div>
+        </section>
+
+        <section class="view" id="view-flows">
+          <div class="view-head"><h1>Question Flows</h1>
+            <div class="head-actions">
+              <input id="fl-search" type="text" class="head-search" aria-label="Search flows" placeholder="Search flows" autocomplete="off">
+              <label for="fl-category" class="sr-only">Category</label><select id="fl-category" class="head-select"></select>
+              <label for="fl-sort" class="sr-only">Sort by</label><select id="fl-sort" class="head-select"><option value="name">Sort: A to Z</option><option value="updated">Sort: recently edited</option><option value="used">Sort: most used</option></select>
+              <button id="fl-select" type="button" class="btn btn-ghost" aria-pressed="false" title="Pick several flows to move or delete">Select</button>
+              <button id="fl-import" type="button" class="btn btn-ghost" title="Import flows from a .json file">Import</button>
+              <button id="fl-export" type="button" class="btn btn-ghost" title="Save all flows as a .json file">Export</button>
+              <button id="fl-new" type="button" class="btn">New flow</button>
+              <input id="fl-file" type="file" accept=".json" hidden>
+            </div></div>
+          <p class="empty small">Probing questions that lead to the right KI. In the Ticket Generator you click the answers the user gives, and the flow suggests a KI.</p>
+          <p id="fl-summary" class="empty small" aria-live="polite"></p>
+          <div id="fl-bulk" class="bulk-bar" hidden></div>
+          <div id="fl-list" class="sc-list"></div>
+        </section>
+
+        <section class="view" id="view-scripts">
+          <div class="view-head"><h1>Script Library</h1>
+            <div class="head-actions">
+              <input id="sc-search" type="text" class="head-search" aria-label="Search scripts" placeholder="Search title, tag, category or code" autocomplete="off">
+              <label for="sc-category" class="sr-only">Category</label><select id="sc-category" class="head-select"></select>
+              <label for="sc-typesel" class="sr-only">Type</label><select id="sc-typesel" class="head-select"></select>
+              <label for="sc-sort" class="sr-only">Sort by</label><select id="sc-sort" class="head-select"><option value="name">Sort: A to Z</option><option value="updated">Sort: recently edited</option><option value="used">Sort: recently used</option></select>
+              <button id="sc-new" type="button" class="btn">New script</button>
+            </div></div>
+          <div class="sc-bar">
+            <div id="sc-show" class="seg" role="group" aria-label="Show">
+              <button type="button" data-show="all" class="active" aria-pressed="true">All</button>
+              <button type="button" data-show="favorites" aria-pressed="false">Favorites</button>
+              <button type="button" data-show="recent" aria-pressed="false">Recently used</button>
+            </div>
+            <p id="sc-summary" class="empty small" aria-live="polite"></p>
+            <div class="sc-bar-actions">
+              <button id="sc-expand" type="button" class="btn btn-ghost btn-sm">Expand all</button>
+              <button id="sc-collapse" type="button" class="btn btn-ghost btn-sm">Collapse all</button>
+              <button id="sc-select" type="button" class="btn btn-ghost btn-sm" aria-pressed="false" title="Pick several items to move, tag or delete">Select</button>
+              <button id="sc-import" type="button" class="btn btn-ghost btn-sm" title="Import a .bat, .ps1, .sh, .reg or .txt file, or a library .json file">Import file</button>
+              <button id="sc-export" type="button" class="btn btn-ghost btn-sm" title="Save the whole library as a .json file">Export library</button>
+            </div>
+            <input id="sc-file-input" type="file" accept=".bat,.cmd,.ps1,.sh,.reg,.txt,.json" hidden>
+          </div>
+          <div id="sc-bulk" class="bulk-bar" hidden></div>
+          <div id="sc-list" class="sc-list"></div>
+        </section>
+
+        <section class="view" id="view-history">
+          <div class="view-head"><h1>Ticket History</h1>
+            <div class="head-actions"><input id="hist-search" type="text" class="head-search" aria-label="Filter saved tickets" placeholder="Filter by user, hostname, KI or text" autocomplete="off">
+            <button id="hist-csv" type="button" class="btn btn-ghost">Export CSV</button></div></div>
+          <div class="filter-row" role="group" aria-label="Filter saved tickets">
+            <label for="hist-from">From</label><input id="hist-from" type="date">
+            <label for="hist-to">To</label><input id="hist-to" type="date">
+            <label for="hist-outcome" class="sr-only">Outcome</label><select id="hist-outcome"></select>
+            <label for="hist-ki" class="sr-only">KI</label><select id="hist-ki"></select>
+            <button id="hist-clear" type="button" class="btn btn-ghost btn-sm">Clear filters</button>
+          </div>
+          <p id="hist-summary" class="empty small" aria-live="polite"></p>
+          <div id="hist-layout" class="kb-layout">
+            <ul id="hist-list" class="result-list"></ul>
+            <article id="hist-detail" class="panel"></article>
+          </div>
+        </section>
+
+        <!-- FAVORITES -->
+        <section class="view" id="view-favorites"><h1>Favorites</h1><ul id="favorites-list" class="result-list"></ul></section>
+
+        <!-- DASHBOARD -->
+        <section class="view" id="view-dashboard">
+          <div class="view-head"><h1>Dashboard</h1>
+            <div class="head-actions"><button id="dash-handoff" type="button" class="btn">Shift handoff...</button></div></div>
+          <p id="dash-backup" class="warn" hidden></p>
+          <p id="dash-storage" class="warn" hidden></p>
+          <div class="panel tk-block" id="dash-restore" hidden>
+            <h2>Starting fresh?</h2>
+            <p class="empty small">No saved tickets or backups were found in this browser. If you used the toolkit before, on this computer or another browser, restore your backup file now.</p>
+            <div class="btn-row"><button id="dash-restore-btn" type="button" class="btn btn-sm">Restore from a backup file</button><button id="dash-restore-dismiss" type="button" class="btn btn-ghost btn-sm">Not now</button></div>
+          </div>
+          <div class="panel tk-block" id="dash-follow-panel" hidden><h2>Follow-ups</h2><ul class="list" id="dash-followups"></ul></div>
+          <div class="stat-row">
+            <div class="stat"><span class="stat-num" id="stat-kb">0</span><span class="stat-label">Knowledge Base articles</span></div>
+            <div class="stat"><span class="stat-num" id="stat-tickets">0</span><span class="stat-label">Tickets saved</span></div>
+            <div class="stat"><span class="stat-num" id="stat-today">0</span><span class="stat-label">Tickets saved today</span></div>
+            <div class="stat"><span class="stat-num" id="stat-favs">0</span><span class="stat-label">Favorite articles</span></div>
+          </div>
+          <div class="panel-row">
+            <div class="panel"><h2>Recently opened articles</h2><ul class="list" id="dash-recent"></ul></div>
+            <div class="panel"><h2>Most used KIs</h2><ul class="list" id="dash-top"></ul></div>
+            <div class="panel"><h2>Recent ticket activity</h2><ul class="list" id="dash-tickets"></ul></div>
+          </div>
+          <div class="panel"><h2>Tickets saved - last 7 days</h2><div id="dash-bars" class="bars"></div></div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section class="view" id="view-settings">
+          <h1>Settings</h1>
+          <div id="set-tabs" class="seg-tabs" role="tablist" aria-label="Settings sections">
+            <button type="button" role="tab" data-sec="backup" aria-selected="true">Backup</button>
+            <button type="button" role="tab" data-sec="defaults" aria-selected="false" tabindex="-1">Defaults</button>
+            <button type="button" role="tab" data-sec="templates" aria-selected="false" tabindex="-1">Templates</button>
+            <button type="button" role="tab" data-sec="data" aria-selected="false" tabindex="-1">Data and help</button>
+          </div>
+          <div class="settings-grid">
+            <div class="panel" data-sec="backup">
+              <h2>Backup and restore</h2>
+              <p class="empty small">Everything lives in this browser. Clearing browser data would erase it, so export a backup regularly. Restoring a backup replaces the current data.</p>
+              <p id="set-last" class="empty small"></p>
+              <div class="btn-row">
+                <button id="set-export" type="button" class="btn">Export backup</button>
+                <button id="set-import" type="button" class="btn btn-ghost">Restore from file</button>
+                <input id="set-file" type="file" accept=".json,application/json" hidden aria-label="Choose a backup file">
+              </div>
+            </div>
+            <div class="panel" data-sec="backup">
+              <h2>Automatic backup to a folder</h2>
+              <p id="bk-status" class="empty small"></p>
+              <p id="bk-persist" class="empty small"></p>
+              <div class="btn-row">
+                <button id="bk-choose" type="button" class="btn">Choose backup folder</button>
+                <button id="bk-now" type="button" class="btn btn-ghost" hidden>Back up now</button>
+                <button id="bk-reconnect" type="button" class="btn" hidden>Reconnect folder</button>
+                <button id="bk-stop" type="button" class="btn btn-ghost" hidden>Turn off</button>
+              </div>
+              <div class="btn-row">
+                <button id="bk-verify-latest" type="button" class="btn btn-ghost btn-sm" title="Read the newest backup in your folder and check it, without changing anything">Check latest backup</button>
+                <button id="bk-verify-file" type="button" class="btn btn-ghost btn-sm" title="Pick a backup file and check that it can be restored">Check a backup file...</button>
+                <input id="bk-verify-input" type="file" accept=".json" hidden>
+              </div>
+            </div>
+            <div class="panel" data-sec="backup">
+              <h2>Share pack</h2>
+              <p class="empty small">Send your Knowledge Base, flows, scripts, canned responses, email templates and checklists to a teammate in one file. When you import one, you see what is new or changed before anything is added. Tickets and settings are never included.</p>
+              <div class="btn-row">
+                <button id="sp-export" type="button" class="btn btn-ghost">Export a share pack...</button>
+                <button id="sp-import" type="button" class="btn btn-ghost">Import a share pack...</button>
+                <input id="sp-file" type="file" accept=".json" hidden>
+              </div>
+            </div>
+            <div class="panel" data-sec="backup"><h2>Stored data</h2><ul class="list" id="set-info"></ul>
+              <p id="st-text" class="empty small" aria-live="polite"></p>
+              <div class="btn-row">
+                <button id="st-enable" type="button" class="btn btn-ghost btn-sm" title="Move your data to IndexedDB, which holds far more than normal browser storage">Use large storage</button>
+                <button id="st-disable" type="button" class="btn btn-ghost btn-sm" hidden>Back to normal storage</button>
+                <button id="st-free" type="button" class="btn btn-danger btn-sm" hidden>Free the old copy</button>
+              </div>
+              <p id="st-corrupt" class="warn" hidden></p>
+              <div class="btn-row">
+                <button id="st-corrupt-dl" type="button" class="btn btn-ghost btn-sm" hidden>Download the unreadable data</button>
+                <button id="st-corrupt-del" type="button" class="btn btn-danger btn-sm" hidden>Delete it</button>
+              </div>
+              <div id="set-meter" class="meter" role="progressbar" aria-label="Browser storage used" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="set-meter-bar" class="meter-bar"></span></div>
+              <p id="set-meter-text" class="empty small"></p></div>
+
+            <div class="panel" data-sec="defaults">
+              <h2>Defaults and preferences</h2>
+              <div class="stack">
+                <div><label for="set-tz">Default time zone for new tickets</label><input id="set-tz" type="text" list="tk-tz-list" autocomplete="off"></div>
+                <div><label for="set-outcome">Default outcome for new tickets</label>
+                  <select id="set-outcome"><option value="">Not set</option><option>Resolved</option><option>Escalated</option><option>Pending user response</option><option>Follow-up required</option><option>Unable to resolve</option></select></div>
+                <div><label for="set-style">Work notes format</label>
+                  <select id="set-style"><option value="numbered">Numbered list</option><option value="bullets">Bullets</option><option value="plain">Plain sentences</option></select></div>
+                <div><label for="set-name">Your name</label><input id="set-name" type="text" autocomplete="off"></div>
+                <label class="check"><input type="checkbox" id="set-sign"> Add &ldquo;Analyst: your name&rdquo; to the end of work notes</label>
+                <label class="check"><input type="checkbox" id="set-remind"> Remind me to back up when I close the tab (if the last backup is over 7 days old)</label>
+              </div>
+            </div>
+            <div class="panel" data-sec="defaults">
+              <h2>Appearance</h2>
+              <div class="stack">
+                <div><label for="set-density">Layout density</label>
+                  <select id="set-density"><option value="comfortable">Comfortable</option><option value="compact">Compact (smaller text and spacing)</option></select></div>
+                <div><label for="set-pagesize">Items per page (Knowledge Base, Ticket History, Favorites)</label>
+                  <select id="set-pagesize"><option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option></select></div>
+              </div>
+            </div>
+
+            <div class="panel" data-sec="defaults">
+              <h2>Ticket entry</h2>
+              <div class="stack">
+                <label class="check"><input type="checkbox" id="set-remtz"> New tickets start with the time zone I used last</label>
+                <label class="check"><input type="checkbox" id="set-remoutcome"> New tickets start with the outcome I used last</label>
+                <div><label for="set-uidpat">User ID format (optional)</label>
+                  <input id="set-uidpat" type="text" autocomplete="off" placeholder="^[A-Za-z]\d{4,6}$">
+                  <p class="empty small">A pattern (regular expression). The ticket form reminds you when a User ID does not match. Leave blank to only check for spaces.</p></div>
+                <div><label for="set-hostpat">Hostname format (optional)</label>
+                  <input id="set-hostpat" type="text" autocomplete="off" placeholder="^PH-LT-\d{4}$">
+                  <p class="empty small">Same idea for the machine hostname.</p></div>
+              </div>
+            </div>
+            <div class="panel" data-sec="defaults">
+              <h2>Email signature</h2>
+              <div class="stack">
+                <div><label for="set-signature">Added where an email template uses {{signature}}</label>
+                  <textarea id="set-signature" rows="4" placeholder="Regards,&#10;{{analystName}}&#10;Service Desk"></textarea>
+                  <p class="empty small">Leave blank to use &ldquo;Regards,&rdquo; followed by your name. {{analystName}} inserts your name.</p></div>
+              </div>
+            </div>
+            <div class="panel" data-sec="defaults">
+              <h2>AI rewrite prompts</h2>
+              <div class="stack">
+                <div><label for="set-ai-select">Prompt</label><select id="set-ai-select"></select></div>
+                <div><label for="set-ai-name">Name</label><input id="set-ai-name" type="text" autocomplete="off"></div>
+                <div><label for="set-ai-prompt">Instructions copied with the Temporary notes</label>
+                  <textarea id="set-ai-prompt" rows="14"></textarea>
+                  <p class="empty small">Ask the AI to answer with the headings &ldquo;Short Title:&rdquo; and &ldquo;Incident Description:&rdquo; (or &ldquo;Request Description:&rdquo;) so Apply can find them.</p></div>
+                <div class="btn-row">
+                  <button id="set-ai-save" type="button" class="btn btn-sm">Save changes</button>
+                  <button id="set-ai-new" type="button" class="btn btn-ghost btn-sm">New prompt</button>
+                  <button id="set-ai-del" type="button" class="btn btn-danger btn-sm">Delete</button>
+                  <button id="set-ai-reset" type="button" class="btn btn-ghost btn-sm">Restore starter prompts</button>
+                </div>
+              </div>
+            </div>
+            <div class="panel" data-sec="defaults">
+              <h2>Safety and reminders</h2>
+              <div class="stack">
+                <label class="check"><input type="checkbox" id="set-guard"> Warn me before copying text that looks like a password, card number or ID number</label>
+                <label class="check"><input type="checkbox" id="set-notify"> Show a desktop notification when a follow-up is due (only while the app is open)</label>
+              </div>
+            </div>
+            <div class="panel" data-sec="templates"><h2>Ticket templates</h2><ul class="list" id="set-presets"></ul></div>
+
+            <div class="panel" data-sec="data">
+              <h2>About this app</h2>
+              <p class="empty small">Everything stays in this browser. Nothing is sent anywhere unless you copy it yourself.</p>
+              <div class="btn-row"><button id="whatsnew-btn" type="button" class="btn btn-sm">What's new</button></div>
+            </div>
+            <div class="panel" data-sec="data">
+              <h2>Problems the app hit</h2>
+              <p class="empty small">If something looks wrong, copy these details and send them with your report.</p>
+              <ul id="err-list" class="list"></ul>
+              <div class="btn-row"><button id="err-copy" type="button" class="btn btn-sm" hidden>Copy problem details</button><button id="err-clear" type="button" class="btn btn-ghost btn-sm" hidden>Clear list</button></div>
+            </div>
+            <div class="panel" data-sec="data">
+              <h2>Clear data</h2>
+              <p class="empty small">These actions cannot be undone. Export a backup first.</p>
+              <div class="btn-row">
+                <button id="set-clear-history" type="button" class="btn btn-danger">Clear ticket history</button>
+                <button id="set-clear-all" type="button" class="btn btn-danger">Erase all data</button>
+              </div>
+            </div>
+            <div class="panel" data-sec="data">
+              <h2>Keyboard shortcuts</h2>
+              <ul class="list">
+                <li><kbd>Ctrl</kbd>+<kbd>K</kbd> - command palette (pages, KIs, templates, responses, actions)</li>
+                <li><kbd>/</kbd> - search the Knowledge Base</li>
+                <li><kbd>Enter</kbd> in the Issue field - open the KI picker</li>
+                <li><kbd>Ctrl</kbd>+<kbd>Enter</kbd> - copy ticket details</li>
+                <li><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Enter</kbd> - copy work notes</li>
+                <li><kbd>Ctrl</kbd>+<kbd>S</kbd> - save the ticket</li>
+                <li><kbd>Alt</kbd>+<kbd>S</kbd> - save the ticket and start the next one</li>
+                <li><kbd>Esc</kbd> - close a dialog</li>
+                <li><kbd>Left</kbd> / <kbd>Right</kbd> - move between ticket tabs</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<!-- Data files (plain scripts, no fetch/imports, works on file://) -->
+<script defer src="database/categories.js"></script>
+<script defer src="database/templates.js"></script>
+<script defer src="database/knowledge-base.js"></script>
+<script defer src="database/starter-kb.js"></script>
+<script defer src="database/starter-flows.js"></script>
+<script defer src="database/starter-library.js"></script>
+
+<!-- Modules (load order matters; app.js last) -->
+<script defer src="assets/js/errorlog.js"></script>
+<script defer src="assets/js/dom.js"></script>
+<script defer src="assets/js/storage.js"></script>
+<script defer src="assets/js/guard.js"></script>
+<script defer src="assets/js/modal.js"></script>
+<script defer src="assets/js/secrets.js"></script>
+<script defer src="assets/js/shell.js"></script>
+<script defer src="assets/js/search.js"></script>
+<script defer src="assets/js/pager.js"></script>
+<script defer src="assets/js/commands.js"></script>
+<script defer src="assets/js/knowledge-base.js"></script>
+<script defer src="assets/js/snippets.js"></script>
+<script defer src="assets/js/email.js"></script>
+<script defer src="assets/js/reports.js"></script>
+<script defer src="assets/js/reference.js"></script>
+<script defer src="assets/js/scripts.js"></script>
+<script defer src="assets/js/flowtext.js"></script>
+<script defer src="assets/js/flows.js"></script>
+<script defer src="assets/js/library.js"></script>
+<script defer src="assets/js/checklists.js"></script>
+<script defer src="assets/js/insights.js"></script>
+<script defer src="assets/js/sharepack.js"></script>
+<script defer src="assets/js/tools.js"></script>
+<script defer src="assets/js/version.js"></script>
+<script defer src="assets/js/ticket-generator.js"></script>
+<script defer src="assets/js/escalation.js"></script>
+<script defer src="assets/js/ticket-history.js"></script>
+<script defer src="assets/js/settings.js"></script>
+<script defer src="assets/js/handoff.js"></script>
+<script defer src="assets/js/backup.js"></script>
+<script defer src="assets/js/palette.js"></script>
+<script defer src="assets/js/app.js"></script>
+</body>
+</html>

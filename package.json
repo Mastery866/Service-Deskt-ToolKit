@@ -1,0 +1,8 @@
+{
+  "name": "service-desk-toolkit",
+  "version": "2026.11.11",
+  "private": true,
+  "description": "Offline Service Desk Toolkit. The app needs no install: open index.html. These packages are only for the developer tests.",
+  "scripts": { "test": "node tests/run-all.js", "perf": "node tests/perf/perf.js" },
+  "devDependencies": { "fake-indexeddb": "^6.0.0", "jsdom": "^26.0.0", "postcss": "^8.4.0" }
+}
